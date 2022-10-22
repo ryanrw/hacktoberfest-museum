@@ -1,6 +1,10 @@
 ---
+// Component Imports
+import "atropos/css";
+import "../../style/root.css";
 import { entries } from "../../entries";
 import { snakeCase } from "snake-case";
+import {  DetailedPageProps } from "../../types/card.interface";
 
 export function getStaticPaths() {
   return entries
@@ -11,7 +15,47 @@ export function getStaticPaths() {
     .filter(({ props: { detail } }) => detail !== undefined);
 }
 
+interface Props {
+  title: string
+  detail: DetailedPageProps
+}
 const { title, detail } = Astro.props;
+
+async function getMarkdown(data?: string) {
+  // @todo: check if url is url (maybe we can allow md too)
+  if (!data) return
+  
+  try {
+    const response = await fetch(data)
+    const markdown = await response.text()
+
+    // @todo: parse markdown url to text
+    console.log(markdown)
+  } catch(e) {
+    console.error(e)
+  }
+}
+
 ---
 
-<h1>{title}</h1>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Hacktoberfest Mesuem</title>
+  </head>
+
+  <div class="p-8 md:p-32 h-[95vh]">
+    <div class="bg-HKBF-white/75 w-full overflow-scroll scroll-smooth">
+      <h1>{title}</h1>
+
+      <div>{getMarkdown(detail.descriptionMarkdown)}</div>
+
+      <div>{getMarkdown(detail.contributingMarkdown)}</div>
+      <div>code</div>
+    </div>
+  </div>
+</html>
+
